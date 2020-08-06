@@ -1,0 +1,26 @@
+{
+  "name": "fullstackopen-phonebook",
+  "version": "1.0.0",
+  "description": "learning node",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muqker/fullstackopen-phonebook.git"
+  },
+  "author": "Mihai Ilinca (muqker@muqker.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/muqker/fullstackopen-phonebook/issues"
+  },
+  "homepage": "https://github.com/muqker/fullstackopen-phonebook#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
