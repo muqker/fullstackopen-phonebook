@@ -1,4 +1,5 @@
 const express = require('express')
+const process = require('process')
 const morgan = require('morgan')
 const cors = require('cors')
 require('dotenv').config()
@@ -37,35 +38,28 @@ app.get('/api/persons', (request, response) => {
 
 app.get('/api/persons/:id', (request, response, next) => {
   Person
-  .findById(request.params.id)
-  .then(person => {
-    console.log(person)
-    if (! person)
-      return response.status(404).end()
-    response.json(person)
-  })
-  .catch(error => {
-    next(error)
-  })  
+    .findById(request.params.id)
+    .then(person => {
+      console.log(person)
+      if (! person)
+        return response.status(404).end()
+      response.json(person)
+    })
+    .catch(error => {
+      next(error)
+    })  
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-  .then(result => {
-    response.status(204).end()
-  })
-  .catch(error => next(error))
+    .then((/*result*/) => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
 app.post('/api/persons/', (request, response, next) => {
   const body = request.body
-
-  // validation
-  if (!body.name)
-    return response.status(400).json({error: 'name missing'})
-
-  if (!body.number)
-    return response.status(400).json({error: 'number missing'})
 
   // add it 
   const person = new Person({
@@ -74,8 +68,8 @@ app.post('/api/persons/', (request, response, next) => {
   })
 
   person.save()
-  .then(savedPerson => response.json(savedPerson))
-  .catch(error => next(error))
+    .then(savedPerson => response.json(savedPerson))
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -84,9 +78,14 @@ app.put('/api/persons/:id', (request, response, next) => {
     name: body.name,
     number: body.number,
   }
-  Person.findByIdAndUpdate(request.params.id, person, {new: true})
-  .then(updatedPerson => response.json(updatedPerson))
-  .catch(error => next(error))
+  console.log(request.params.id)
+  console.log(person)
+
+  Person
+    .findByIdAndUpdate(request.params.id, person, 
+      {new: true, runValidators: true, context: 'query'})
+    .then(updatedPerson => response.json(updatedPerson))
+    .catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
@@ -94,9 +93,11 @@ const unknownEndpoint = (request, response) => {
 }
 
 const errorHandler = (error, request, response, next) => {
-  console.log('Error', error.message)
+  console.log('Error', error)
   if (error.name === 'CastError')
     return response.status(400).send({error: 'malformed id'})
+  if (error.name === 'ValidationError')
+    return response.status(400).json({error: error.message})
   next(error)
 }
 
